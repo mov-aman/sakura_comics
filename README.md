@@ -29,13 +29,13 @@
 
 **Technology Stack**
 
-* Frontend:
+Frontend:
 
  - React.js for building the user interface.
  - Redux for state management.
  - Responsive design with CSS.
 
-* Backend:
+Backend:
 
  - Node.js and Express.js for server-side development.
  - MongoDB for the database, using Mongoose for object modeling.
