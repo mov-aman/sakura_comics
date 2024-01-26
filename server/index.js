@@ -1,58 +1,16 @@
 import express from "express";
+import mongoose from "mongoose";
 const app = express()
 const port = 5000;
 
 app.use(express.json());
-    
-let products = {
-    manga: [
-        {
-            title: "One Piece",
-            genre: "Shonen",
-            author: "Eiichiro Oda",
-            volumes: 102,
-            ongoing: true,
-            averageRating: 4.9,
-            userRated: 9,
-        },
-        {
-            title: "Attack on Titan",
-            genre: "Shingeki no Kyojin",
-            author: "Hajime Isayama",
-            volumes: 34,
-            ongoing: false,
-            averageRating: 4.7,
-            userRated: 4,
-        },
-        {
-            title: "My Hero Academia",
-            genre: "Boku no Hero Academia",
-            author: "Kohei Horikoshi",
-            volumes: 34,
-            ongoing: true,
-            averageRating: 4.8,
-            userRated: 1,
-        },
-        {
-            title: "Death Note",
-            genre: "Mystery, Thriller",
-            author: "Tsugumi Ohba",
-            volumes: 12,
-            ongoing: false,
-            averageRating: 4.6,
-            userRated: 3,
-        },
-        {
-            title: "Demon Slayer",
-            genre: "Kimetsu no Yaiba",
-            author: "Koyoharu Gotouge",
-            volumes: 23,
-            ongoing: false,
-            averageRating: 4.9,
-            userRated: 2,
-        }
-    ],
-};
+
+//Database connection with MondoDB
+mongoose.connect("mongodb+srv://putin:VYDnhdQllH3F37GA@cluster0.klv3svi.mongodb.net/e-commerce")
+
+    .then(() => console.log("MongoDB connected…"))
+    .catch((err) => console.log(err));
+
 // GET - List all Mangas
 app.get("/products", (req, res) => {
     res.json(products.manga);
@@ -108,10 +66,51 @@ app.get("/products/:titleName/rating", (req, res) => {
     res.json({ averageRating: title.averageRating });
 });
 
+// Schema for creating Products
+const mangaSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    genre: {
+        type: String,
+        require: true,
+    },
+    author: {
+        type: String,
+        required: true,
+    },
+    volumes: {
+        type: Number,
+        required: true,
+    },
+    ongoing: {
+        type: Boolean,
+        default: false,
+    },
+    averageRating: {
+        type: Number,
+        default: 0,
+    },
+    userRated: {
+        type: Number,
+        default: 0,
+    },
+});
+
+// Create a model based on the schema
+const Manga = mongoose.model("Manga", mangaSchema);
+
 // POST - Create a new manga
-app.post("/products", (req, res) => {
-    products.manga.push(req.body);
-    res.send("Title added");
+app.post("/products", async (req, res) => {
+    try {
+        const newManga = new Manga(req.body);
+        const savedManga = await newManga.save();
+        res.status(201).json(savedManga);
+    } catch (error) {
+        res.status(500).json({ error: "Internal server error" })
+    }
 });
 
 // POST - Add a rating for a manga
@@ -234,6 +233,11 @@ app.get("/*", (req, res) => {
     console.log("You are on a invalid route:", req.path);
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+app.listen(port, (error) => {
+    if (!error) {
+        console.log(`Server is running on http://localhost:${port}`);
+    }
+    else {
+        console.log("Error :" + error);
+    }
 });
