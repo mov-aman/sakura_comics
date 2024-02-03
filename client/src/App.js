@@ -1,12 +1,15 @@
 import './App.css';
 import Navbar from './Components/Navbar/Navbar';
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Product from './Pages/Product';
 import ProductCategory from './Pages/ProductCategory';
 import Cart from './Pages/Cart';
 import LoginSignup from './Pages/LoginSignup';
 import Home from './Pages/Home';
 import Footer from './Components/Footer/Footer';
+import newRelease from './Components/Assets/banner_release.jpg';
+import bestSeller from './Components/Assets/banner_best.jpg';
+import classicTitle from './Components/Assets/banner_classic.jpg';
 
 function App() {
   return (
@@ -15,16 +18,16 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/newReleases" element={<ProductCategory category = "newRelease" />} />
-          <Route path="/bestSellers" element={<ProductCategory category = "bestSeller" />} />
-          <Route path="/classicTitles" element={<ProductCategory category = "classicTitle" />} />
-          <Route path="/products" element={<Product/>}>
-            <Route path=':productId' element={<Product/>} />
+          <Route path="/newReleases" element={<ProductCategory banner={newRelease} category="newRelease" />} />
+          <Route path="/bestSellers" element={<ProductCategory banner={bestSeller} category="bestSeller" />} />
+          <Route path="/classicTitles" element={<ProductCategory banner={classicTitle} category="classicTitle" />} />
+          <Route path="/products" element={<Product />}>
+            <Route path=':productId' element={<Product />} />
           </Route>
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<LoginSignup />} />
         </Routes>
-        <Footer/>
+        <Footer />
       </BrowserRouter>
     </div>
   );
