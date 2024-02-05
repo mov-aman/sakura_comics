@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import './ProductDisplay.css'
 import star_icon from '../Assets/star_icon.png'
 import star_dull_icon from '../Assets/star_dull_icon.png'
+import { EcomContext } from '../../Context/EcomContext'
 
 const ProductDisplay = (props) => {
     const {product} = props;
+    const {addToCart} = useContext(EcomContext);
     return (
         <div className='productdisplay'>
             <div className="productdisplay-left">
@@ -35,7 +37,7 @@ const ProductDisplay = (props) => {
                 <div className="productdisplay-right-discription">
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo, ducimus ratione aspernatur ullam beatae molestiae libero officiis quia. Hic et expedita totam ipsam neque id, animi similique voluptatum est ducimus?
                 </div>
-                <button className='productdisplay-right-button'>ADD TO CART</button>
+                <button onClick={()=>{addToCart(product.id)}}className='productdisplay-right-button'>ADD TO CART</button>
                 <p className='productdisplay-right-category'><span>Category :</span>New Release, Mystery, Seinen, Fantasy</p>
                 <p className='productdisplay-right-category'><span>Tags :</span>Latest, New</p>
             </div>
