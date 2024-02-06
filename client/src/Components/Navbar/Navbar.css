@@ -1,3 +1,4 @@
+/* Base styles for the navbar */
 .navbar {
     display: flex;
     justify-content: space-around;
@@ -89,4 +90,37 @@
     font-size: 14px;
     background: rgb(240, 73, 12);
     color: white;
+}
+
+/* Responsive Media Queries */
+/* Small devices (portrait phones) */
+@media only screen and (max-width: 600px) {
+    .navbar {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .nav-menu {
+        gap: 20px;
+    }
+
+    .nav-login-cart {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Medium devices (landscape tablets) */
+@media only screen and (min-width: 600px) {
+    /* Add any specific styles for medium devices if needed */
+}
+
+/* Large devices (laptops/desktops) */
+@media only screen and (min-width: 992px) {
+    /* Add any specific styles for large devices if needed */
+}
+
+/* Extra large devices (large laptops and desktops) */
+@media only screen and (min-width: 1200px) {
+    /* Add any specific styles for extra large devices if needed */
 }

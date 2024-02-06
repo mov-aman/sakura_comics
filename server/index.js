@@ -1,9 +1,14 @@
 import express from "express";
 import mongoose from "mongoose";
+// import jwt from "jsonwebtoken";
+import multer from "multer";
+import path from "path";
+import cors from "cors";
 const app = express()
 const port = 5000;
 
 app.use(express.json());
+app.use(cors());
 
 //Database connection with MondoDB
 mongoose.connect("mongodb+srv://putin:VYDnhdQllH3F37GA@cluster0.klv3svi.mongodb.net/e-commerce")
@@ -12,26 +17,53 @@ mongoose.connect("mongodb+srv://putin:VYDnhdQllH3F37GA@cluster0.klv3svi.mongodb.
     .catch((err) => console.log(err));
 
 // GET - List all Mangas
-app.get("/products", (req, res) => {
-    res.json(products.manga);
+app.get("/product", (req, res) => {
+    res.json(product.manga);
 })
 
+// app.get("/", (req, res) => {
+//     {
+//         res.send("Running...")
+//     }
+// })
+
+//image storage engine
+const storage = multer.diskStorage({
+    destination: './upload/images',
+    filename: (req, file, cb) => {
+        return cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
+    }
+})
+
+const upload = multer({ storage: storage })
+
+// creating upload endpoint for images
+app.use('/images', express.static('upload/images'));
+
+app.post("/upload", upload.single("product"), (req, res) => {
+    res.json({
+        success: 1,
+        image_url: `http://localhost:${port}/images/${req.file.filename}`
+    });
+})
+
+
 // GET - Details of a specific manga by name
-app.get("/products/:titleName", (req, res) => {
-    // Edge case: Check if products or products.manga is defined
-    if (!products || !products.manga) {
-        return res.status(500).json({ error: "Internal server error: Products data structure not properly initialized" });
+app.get("/product/:titleName", (req, res) => {
+    // Edge case: Check if product or product.manga is defined
+    if (!product || !product.manga) {
+        return res.status(500).json({ error: "Internal server error: product data structure not properly initialized" });
     }
     const titleName = req.params.titleName;
     // Edge case: Check if titleName is a valid non-empty string
     if (!titleName || typeof titleName !== 'string') {
         return res.status(400).json({ error: "Invalid titleName parameter" });
     }
-    // Edge case: Check if products.manga array is empty
-    if (!products.manga.length) {
+    // Edge case: Check if product.manga array is empty
+    if (!product.manga.length) {
         return res.status(404).json({ error: "No manga titles found" });
     }
-    const title = products.manga.find((c) => c.title === titleName);
+    const title = product.manga.find((c) => c.title === titleName);
     // Edge case: Check if title is found
     if (!title) {
         return res.status(404).json({ error: "Title not found" });
@@ -40,21 +72,21 @@ app.get("/products/:titleName", (req, res) => {
 });
 
 // GET - Average rating of a specific manga
-app.get("/products/:titleName/rating", (req, res) => {
-    // Edge case: Check if products or products.manga is defined
-    if (!products || !products.manga) {
-        return res.status(500).json({ error: "Internal server error: Products data structure not properly initialized" });
+app.get("/product/:titleName/rating", (req, res) => {
+    // Edge case: Check if product or product.manga is defined
+    if (!product || !product.manga) {
+        return res.status(500).json({ error: "Internal server error: product data structure not properly initialized" });
     }
     const titleName = req.params.titleName;
     // Edge case: Check if titleName is a valid non-empty string
     if (!titleName || typeof titleName !== 'string') {
         return res.status(400).json({ error: "Invalid titleName parameter" });
     }
-    // Edge case: Check if products.manga array is empty
-    if (!products.manga.length) {
+    // Edge case: Check if product.manga array is empty
+    if (!product.manga.length) {
         return res.status(404).json({ error: "No manga titles found" });
     }
-    const title = products.manga.find((c) => c.title === titleName);
+    const title = product.manga.find((c) => c.title === titleName);
     // Edge case: Check if title is found
     if (!title) {
         return res.status(404).json({ error: "Title not found" });
@@ -66,7 +98,7 @@ app.get("/products/:titleName/rating", (req, res) => {
     res.json({ averageRating: title.averageRating });
 });
 
-// Schema for creating Products
+// Schema for creating product
 const mangaSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -103,7 +135,7 @@ const mangaSchema = new mongoose.Schema({
 const Manga = mongoose.model("Manga", mangaSchema);
 
 // POST - Create a new manga
-app.post("/products", async (req, res) => {
+app.post("/product", async (req, res) => {
     try {
         const newManga = new Manga(req.body);
         const savedManga = await newManga.save();
@@ -114,8 +146,8 @@ app.post("/products", async (req, res) => {
 });
 
 // POST - Add a rating for a manga
-app.post("/products/:titleName/rating", (req, res) => {
-    const title = products.manga.find((c) => c.title === req.params.titleName);
+app.post("/product/:titleName/rating", (req, res) => {
+    const title = product.manga.find((c) => c.title === req.params.titleName);
     if (!title) {
         return res.status(404).json({ error: "Title not found" });
     }
@@ -135,21 +167,21 @@ app.post("/products/:titleName/rating", (req, res) => {
 });
 
 // PUT - Modify information of a manga
-app.put("/products/:titleName", (req, res) => {
-    // Edge case: Check if products or products.manga is defined
-    if (!products || !products.manga) {
-        return res.status(500).json({ error: "Internal server error: Products data structure not properly initialized" });
+app.put("/product/:titleName", (req, res) => {
+    // Edge case: Check if product or product.manga is defined
+    if (!product || !product.manga) {
+        return res.status(500).json({ error: "Internal server error: product data structure not properly initialized" });
     }
     const titleName = req.params.titleName;
     // Edge case: Check if titleName is a valid non-empty string
     if (!titleName || typeof titleName !== 'string') {
         return res.status(400).json({ error: "Invalid titleName parameter" });
     }
-    // Edge case: Check if products.manga array is empty
-    if (!products.manga.length) {
+    // Edge case: Check if product.manga array is empty
+    if (!product.manga.length) {
         return res.status(404).json({ error: "No manga titles found" });
     }
-    const index = products.manga.findIndex((c) => c.title === titleName);
+    const index = product.manga.findIndex((c) => c.title === titleName);
     // Edge case: Check if title is found
     if (index === -1) {
         return res.status(404).json({ error: "Title not found" });
@@ -159,26 +191,26 @@ app.put("/products/:titleName", (req, res) => {
         return res.status(400).json({ error: "Invalid request body. Expected an object" });
     }
     // Update the title with the properties from req.body
-    products.manga[index] = { ...products.manga[index], ...req.body };
+    product.manga[index] = { ...product.manga[index], ...req.body };
     res.send("Title updated");
 });
 
 // PATCH - Update partial information of a manga
-app.patch("/products/:titleName", (req, res) => {
-    // Edge case: Check if products or products.manga is defined
-    if (!products || !products.manga) {
-        return res.status(500).json({ error: "Internal server error: Products data structure not properly initialized" });
+app.patch("/product/:titleName", (req, res) => {
+    // Edge case: Check if product or product.manga is defined
+    if (!product || !product.manga) {
+        return res.status(500).json({ error: "Internal server error: product data structure not properly initialized" });
     }
     const titleName = req.params.titleName;
     // Edge case: Check if titleName is a valid non-empty string
     if (!titleName || typeof titleName !== 'string') {
         return res.status(400).json({ error: "Invalid titleName parameter" });
     }
-    // Edge case: Check if products.manga array is empty
-    if (!products.manga.length) {
+    // Edge case: Check if product.manga array is empty
+    if (!product.manga.length) {
         return res.status(404).json({ error: "No manga titles found" });
     }
-    const index = products.manga.findIndex((c) => c.title === titleName);
+    const index = product.manga.findIndex((c) => c.title === titleName);
     // Edge case: Check if title is found
     if (index === -1) {
         return res.status(404).json({ error: "Title not found" });
@@ -187,7 +219,7 @@ app.patch("/products/:titleName", (req, res) => {
     if (typeof req.body !== 'object' || req.body === null) {
         return res.status(400).json({ error: "Invalid request body. Expected an object" });
     }
-    const titleToUpdate = products.manga[index];
+    const titleToUpdate = product.manga[index];
     // Update specific fields if they exist in the request body
     if (req.body.author !== undefined) titleToUpdate.author = req.body.author;
     if (req.body.volumes !== undefined) titleToUpdate.volumes = req.body.volumes;
@@ -198,34 +230,34 @@ app.patch("/products/:titleName", (req, res) => {
 
 // DELETE - Remove a manga by name
 app.delete("/product/:titleName", (req, res) => {
-    // Edge case: Check if products or products.manga is defined
-    if (!products || !products.manga) {
-        return res.status(500).json({ error: "Internal server error: Products data structure not properly initialized" });
+    // Edge case: Check if product or product.manga is defined
+    if (!product || !product.manga) {
+        return res.status(500).json({ error: "Internal server error: product data structure not properly initialized" });
     }
     const titleName = req.params.titleName
     // Edge case: Check if titleName is a valid non-empty string
     if (!titleName || typeof titleName !== 'string') {
         return res.status(400).json({ error: "Invalid titleName parameter" });
     }
-    // Edge case: Check if products.manga array is empty
-    if (!products.manga.length) {
+    // Edge case: Check if product.manga array is empty
+    if (!product.manga.length) {
         return res.status(404).json({ error: "No manga titles found" });
     }
-    const index = products.manga.findIndex((c) => c.title === titleName);
+    const index = product.manga.findIndex((c) => c.title === titleName);
     // Edge case: Check if title is found
     if (index === -1) {
         return res.status(404).json({ error: "Title not found" });
     }
     // Perform the deletion
-    products.manga.splice(index, 1);
+    product.manga.splice(index, 1);
     res.send("Manga title deleted");
 });
 
 app.get("/*", (req, res) => {
     const possibleRoutes = [
-        "/products",
-        "/products/:titleName",
-        "/products/:titleName/rating",
+        "/product",
+        "/product/:titleName",
+        "/product/:titleName/rating",
         // Add other routes as needed
     ];
     const message = `You are on the wrong route. Here's the list of possible routes:\n${possibleRoutes.join("\n")}`;
