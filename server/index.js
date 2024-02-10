@@ -4,7 +4,9 @@ import jwt from "jsonwebtoken";
 import multer from "multer";
 import path from "path";
 import cors from "cors";
+// import 'dotenv/config'
 const app = express()
+// const port = process.env.PORT;
 const port = 5000;
 
 app.use(express.json());
@@ -15,11 +17,6 @@ mongoose.connect("mongodb+srv://putin:VYDnhdQllH3F37GA@cluster0.klv3svi.mongodb.
 
   .then(() => console.log("MongoDB connected…"))
   .catch((err) => console.log(err));
-
-// GET - List all Mangas
-// app.get("/product", (req, res) => {
-//     res.json(product.manga);
-// })
 
 app.get("/", (req, res) => {
   {
@@ -118,25 +115,35 @@ app.post('/addproduct', async (req, res) => {
 });
 
 // API for updating products using PATCH request
-app.patch('/updateproduct', async (req, res) => {
+app.patch('/updateproduct/:id', async (req, res) => {
   try {
-    const updatedProduct = await Product.findOneAndUpdate(
-      { id: req.body.id },
-      {
-        $set: {
-          name: req.body.name,
-          image: req.body.image,
-          category: req.body.category,
-          new_price: req.body.new_price,
-          old_price: req.body.old_price,
-        }
-      },
-      { new: true }
-    );
-    console.log("Updated");
+    const productId = req.params.id;
+    let product = await Product.findOne({ id: productId });
+    if (!product) {
+      return res.status(404).json({ success: 0, error: "Product not found" });
+    }
+    if (req.body.name) {
+      product.name = req.body.name;
+    }
+    if (req.body.image) {
+      product.image = req.body.image;
+    }
+    if (req.body.category) {
+      product.category = req.body.category;
+    }
+    if (req.body.new_price) {
+      product.new_price = req.body.new_price;
+    }
+    if (req.body.old_price) {
+      product.old_price = req.body.old_price;
+    }
+
+    await product.save();
+
+    console.log("Updated product:", product);
     res.json({
       success: 1,
-      updatedProduct,
+      message: "Product updated successfully",
     });
   } catch (error) {
     console.error("Error during product update:", error);
@@ -144,31 +151,6 @@ app.patch('/updateproduct', async (req, res) => {
   }
 });
 
-// API for updating products using PUT request
-app.put('/replaceproduct/:id', async (req, res) => {
-  try {
-    const updatedProduct = await Product.findOneAndReplace(
-      { id: req.params.id },
-      {
-        id: req.params.id,
-        name: req.body.name,
-        image: req.body.image,
-        category: req.body.category,
-        new_price: req.body.new_price,
-        old_price: req.body.old_price,
-      },
-      { new: true }
-    );
-    console.log("Replaced");
-    res.json({
-      success: 1,
-      updatedProduct,
-    });
-  } catch (error) {
-    console.error("Error during product replacement:", error);
-    res.status(500).json({ success: 0, error: "Internal Server Error" });
-  }
-});
 
 // API for deleting products
 app.delete('/removeproduct', async (req, res) => {
@@ -241,7 +223,7 @@ app.post('/signup', async (req, res) => {
     }
   }
   const token = jwt.sign(data, 'secret_ecom');
-  res.json({success: true, token})
+  res.json({ success: true, token })
 })
 
 // api for user login
@@ -257,7 +239,7 @@ app.post('/login', async (req, res) => {
         }
       }
       //jwt token
-      const token = jwt.sign(data,'secret_ecom');
+      const token = jwt.sign(data, 'secret_ecom');
       res.json({ success: true, token });
     }
     else {
@@ -281,24 +263,53 @@ app.get('/newcollections', async (req, res) => {
 // api for popular new Releases
 
 app.get('/popularnewrelease', async (req, res) => {
-  let products = await Product.find({category: 'newRelease'});
-  let popularnew = products.slice(0,4);
+  let products = await Product.find({ category: 'newRelease' });
+  let popularnew = products.slice(0, 4);
   console.log("popularnew");
   res.send(popularnew);
 })
 
+//middelware to fetch user
+const fetchUser = async (req, res, next) => {
+  const token = req.header('auth.token');
+  if (!token) {
+    res.status(401).send({ errors: "Please authenticate using vaild credentials" })
+  }
+  else {
+    try {
+      const data = jwt.verify(token, 'secret_ecom');
+      req.user = data.user;
+      next();
+    } catch (error) {
+      res.status(401).send({ errors: "Please authenticate using vaild token" })
+    }
+  }
+}
 
-// app.get("/*", (req, res) => {
-//     const possibleRoutes = [
-//         "/product",
-//         "/product/:titleName",
-//         "/product/:titleName/rating",
-//         // Add other routes as needed
-//     ];
-//     const message = `You are on the wrong route. Here's the list of possible routes:\n${possibleRoutes.join("\n")}`;
-//     res.send(message);
-//     console.log("You are on a invalid route:", req.path);
-// });
+app.post('/addtocart', fetchUser, async (req, res) => {
+  
+  let userData = await Users.findOne({ _id: req.user.id });
+  userData.cartData[req.body.itemId] += 1;
+  await Users.findByIdAndUpdate({ _id: req.user.id }, { cartData: userData.cartData });
+  res.send("Successfully added");
+})
+
+app.post('/removefromcart', fetchUser, async (req, res) => {
+  console.log("Removed", req.body.itemId);
+  let userData = await Users.findOne({ _id: req.user.id });
+  if (userData.cartData[req.body.itemId]>0)
+  userData.cartData[req.body.itemId] -= 1;
+  await Users.findByIdAndUpdate({ _id: req.user.id }, { cartData: userData.cartData });
+  res.send("Successfully added");
+})
+
+//creating endpoint to get cart data
+
+app.post('/getcart', fetchUser, async(req, res) => {
+  console.log("GetCart");
+  let userData = await Users.findOne({ _id: req.user.id });
+  res.json(userData.cartData);
+})
 
 app.listen(port, (error) => {
   if (!error) {

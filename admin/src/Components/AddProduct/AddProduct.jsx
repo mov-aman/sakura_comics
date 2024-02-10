@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './AddProduct.css';
 import upload_area from '../../assets/image_upload.png';
 
@@ -11,6 +13,8 @@ const AddProduct = () => {
         new_price: '',
         old_price: '',
     });
+
+    const [productId, setProductId] = useState('');
 
     const imageHandler = (e) => {
         setImage(e.target.files[0]);
@@ -55,9 +59,11 @@ const AddProduct = () => {
                 })
                     .then((resp) => resp.json())
                     .then((data) => {
-                        data.success
-                            ? alert('Product added successfully')
-                            : alert('Failed to add product');
+                        if (data.success) {
+                            toast.success('Product added successfully');
+                        } else {
+                            toast.error('Failed to add product');
+                        }
                     });
             }
         } catch (error) {
@@ -65,8 +71,16 @@ const AddProduct = () => {
         }
     };
 
+    // ...
+
     const updateProduct = async () => {
         try {
+
+            if (!productId) {
+                toast.error('Please provide a product ID');
+                return;
+            }
+
             let responseData;
             let product = { ...productDetails };
             let formData = new FormData();
@@ -87,10 +101,9 @@ const AddProduct = () => {
 
             if (responseData.success) {
                 product.image = responseData.image_url;
-                console.log(product);
 
-                // Update product using PATCH API
-                await fetch('http://localhost:5000/updateproduct', {
+                // Include the product ID in the update request
+                await fetch(`http://localhost:5000/updateproduct/${productId}`, {
                     method: 'PATCH',
                     headers: {
                         Accept: 'application/json',
@@ -100,15 +113,20 @@ const AddProduct = () => {
                 })
                     .then((resp) => resp.json())
                     .then((data) => {
-                        data.success
-                            ? alert('Product updated successfully')
-                            : alert('Failed to update product');
+                        if (data.success) {
+                            toast.success('Product updated successfully');
+                        } else {
+                            toast.error('Failed to update product');
+                        }
                     });
             }
         } catch (error) {
             console.error('Error updating product:', error);
         }
     };
+
+    // ...
+
 
     return (
         <div className='addproduct'>
@@ -120,6 +138,12 @@ const AddProduct = () => {
                     type='text'
                     name='name'
                     placeholder='Manga Title'
+                />
+                <input
+                    value={productId}
+                    onChange={(e) => setProductId(e.target.value)}
+                    type='text'
+                    placeholder='Product ID'
                 />
                 <div className='addproduct-price'>
                     <div className='addproduct-itemfiled'>
@@ -170,9 +194,10 @@ const AddProduct = () => {
                     <button onClick={() => addProduct()} className='addproduct-btn'>
                         ADD
                     </button>
-                    <button onClick={() => updateProduct()} className='addproduct-btn'>
+                    <button onClick={() => updateProduct(1)} className='addproduct-btn'>
                         UPDATE
                     </button>
+
                 </div>
             </div>
         </div>
