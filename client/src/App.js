@@ -11,6 +11,8 @@ import newRelease from './Components/Assets/banner_release.jpg';
 import bestSeller from './Components/Assets/banner_best.jpg';
 import classicTitle from './Components/Assets/banner_classic.jpg';
 
+// const sakura = process.env.React_APP_DOMAIN;
+
 function App() {
   return (
     <div>
