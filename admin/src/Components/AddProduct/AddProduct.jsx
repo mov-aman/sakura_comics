@@ -32,7 +32,7 @@ const AddProduct = () => {
             formData.append('product', image);
 
             // Upload image
-            await fetch('http://localhost:5000/upload', {
+            await fetch('https://sakura-emjo.onrender.com/upload', {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -49,7 +49,7 @@ const AddProduct = () => {
                 console.log(product);
 
                 // Add product
-                await fetch('http://localhost:5000/addproduct', {
+                await fetch('https://sakura-emjo.onrender.com/addproduct', {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json',
@@ -87,7 +87,7 @@ const AddProduct = () => {
             formData.append('product', image);
 
             // Upload image
-            await fetch('http://localhost:5000/upload', {
+            await fetch('https://sakura-emjo.onrender.com/upload', {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -103,7 +103,7 @@ const AddProduct = () => {
                 product.image = responseData.image_url;
 
                 // Include the product ID in the update request
-                await fetch(`http://localhost:5000/updateproduct/${productId}`, {
+                await fetch(`https://sakura-emjo.onrender.com/updateproduct/${productId}`, {
                     method: 'PATCH',
                     headers: {
                         Accept: 'application/json',

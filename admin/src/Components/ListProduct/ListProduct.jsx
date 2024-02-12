@@ -5,7 +5,7 @@ const ListProduct = () => {
     const [allproducts, setAllProducts] = useState([]);
 
     const fetchInfo = async () => {
-        await fetch('http://localhost:5000/allproducts').then((res) => res.json()).then((data) => { setAllProducts(data) });
+        await fetch('https://sakura-emjo.onrender.com/allproducts').then((res) => res.json()).then((data) => { setAllProducts(data) });
     }
 
     useEffect(() => {
@@ -13,7 +13,7 @@ const ListProduct = () => {
     }, [])
 
     const remove_product = async(id)=>{
-        await fetch('http://localhost:5000/removeproduct',{
+        await fetch('https://sakura-emjo.onrender.com/removeproduct',{
             method: 'DELETE',
             headers: {
                 Accept: 'application/json',
