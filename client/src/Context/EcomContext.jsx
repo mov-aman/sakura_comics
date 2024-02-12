@@ -16,12 +16,12 @@ const EcomContextProvider = (props) => {
     const [cartItems, setCartItems] = useState(getDefaultCart());
 
     useEffect(() => {
-        fetch('http://localhost:5000/allproducts')
+        fetch('https://sakura-emjo.onrender.com/allproducts')
             .then((response) => response.json())
             .then((data) => setAll_Product(data))
 
             if(localStorage.getItem('auth.token')){
-                fetch('http://localhost:5000/getcart',{
+                fetch('https://sakura-emjo.onrender.com/getcart',{
                     method: 'POST',
                     headers:{
                         Accept: 'application/form-data',
@@ -42,7 +42,7 @@ const EcomContextProvider = (props) => {
             }
         })
         if (localStorage.getItem('auth.token')) {
-            fetch('http://localhost:5000/addtocart', {
+            fetch('https://sakura-emjo.onrender.com/addtocart', {
                 method: 'POST',
                 headers: {
                     Accept: 'application/form-data,',
@@ -66,7 +66,7 @@ const EcomContextProvider = (props) => {
             }
         });
         if (localStorage.getItem('auth.token')) {
-            fetch('http://localhost:5000/removefromcart', {
+            fetch('https://sakura-emjo.onrender.com/removefromcart', {
                 method: 'POST',
                 headers: {
                     Accept: 'application/form-data,',
