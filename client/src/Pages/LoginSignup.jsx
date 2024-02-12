@@ -42,7 +42,7 @@ const LoginSignup = () => {
   const signup = async () => {
     console.log("Signup", formData);
     let responseData;
-    await fetch('http://localhost:5000/signup',{
+    await fetch('https://sakura-emjo.onrender.com/signup',{
       method: 'POST',
       headers: {
         Accept: 'application/form-data',

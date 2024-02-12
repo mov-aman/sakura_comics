@@ -4,16 +4,17 @@ import jwt from "jsonwebtoken";
 import multer from "multer";
 import path from "path";
 import cors from "cors";
-// import 'dotenv/config'
+import 'dotenv/config'
 const app = express()
-// const port = process.env.PORT;
-const port = 5000;
+const port = process.env.PORT;
+// const port = 5000;
 
 app.use(express.json());
 app.use(cors());
 
 //Database connection with MondoDB
-mongoose.connect("mongodb+srv://putin:VYDnhdQllH3F37GA@cluster0.klv3svi.mongodb.net/e-commerce")
+const uri = process.env.MONGODB_URL;
+mongoose.connect(uri)
 
   .then(() => console.log("MongoDB connected…"))
   .catch((err) => console.log(err));
