@@ -41,7 +41,7 @@ app.use('/images', express.static('upload/images'));
 app.post("/upload", upload.single("product"), (req, res) => {
   res.json({
     success: 1,
-    image_url: `http://localhost:${port}/images/${req.file.filename}`
+    image_url: `https://sakura-emjo.onrender.com/images/${req.file.filename}`   //http://localhost:${port}/images/${req.file.filename}
   });
 })
 
@@ -314,7 +314,7 @@ app.post('/getcart', fetchUser, async(req, res) => {
 
 app.listen(port, (error) => {
   if (!error) {
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server is running on https://sakura-emjo.onrender.com`);
   }
   else {
     console.log("Error :" + error);
