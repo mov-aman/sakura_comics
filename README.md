@@ -1,12 +1,11 @@
 # sakura_comics
 
-# Video Demo Link: https://drive.google.com/file/d/14dO3QcPNyLfattlUOROS0G84AkEa156E/view?usp=drivesdk
+**Video Demo Link**
+https://drive.google.com/file/d/14dO3QcPNyLfattlUOROS0G84AkEa156E/view?usp=drivesdk
 
 # API Documentation: https://documenter.getpostman.com/view/32354061/2s9YsT7UkW
 
 # Figma Design: https://www.figma.com/file/81YdtGDjy9piOYzjRJTIUV/Sakura_Comics?type=design&node-id=163%3A2539&mode=design&t=Ze6E4VyZn7B3xnxO-1
-
-# Test API deployment on render: https://test-api-nuf0.onrender.com
 
 # Frontend Deployed link: https://sakura-comics.netlify.app/
 
