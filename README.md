@@ -44,7 +44,7 @@ https://sakura-comics.netlify.app/
 Frontend:
 
  - React.js for building the user interface.
- - Redux for state management.
+ - Context API for state management.
  - Responsive design with CSS.
 
 Backend:
@@ -55,7 +55,7 @@ Backend:
 
 Deployment:
 
- - Deployment on cloud platforms like AWS or Netlify.
+ - Deployment on Render for backend and Netlify for frontend.
 
 **Getting Started**
 
